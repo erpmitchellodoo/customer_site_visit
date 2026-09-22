@@ -1,0 +1,9 @@
+<odoo noupdate="1">
+ <record id="type_site_survey" model="customer.site.visit.type"><field name="name">Site Survey</field></record>
+ <record id="survey_1" model="customer.site.visit.checklist.template"><field name="visit_type_id" ref="type_site_survey"/><field name="name">Verify site address and contact</field><field name="required" eval="True"/></record>
+ <record id="survey_2" model="customer.site.visit.checklist.template"><field name="visit_type_id" ref="type_site_survey"/><field name="name">Capture site photographs</field></record>
+ <record id="survey_3" model="customer.site.visit.checklist.template"><field name="visit_type_id" ref="type_site_survey"/><field name="name">Record measurements / requirements</field></record>
+ <record id="type_sales_visit" model="customer.site.visit.type"><field name="name">Sales Visit</field></record>
+ <record id="type_progress" model="customer.site.visit.type"><field name="name">Project Progress Visit</field></record>
+ <record id="type_inspection" model="customer.site.visit.type"><field name="name">Inspection</field></record>
+</odoo>
