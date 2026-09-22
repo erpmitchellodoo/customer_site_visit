@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="customer_site_visit.Dashboard">
+        <div class="o_site_visit_dashboard h-100 overflow-auto p-3 p-lg-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h3 m-0">Site Visit Dashboard</h1>
+                <button class="btn btn-outline-primary" t-on-click="load" t-att-disabled="state.loading">Refresh</button>
+            </div>
+            <div t-if="state.error" class="alert alert-danger" role="alert" t-out="state.error"/>
+            <div t-if="state.loading" class="text-muted mb-3" role="status">Loading dashboard…</div>
+            <t t-if="state.data and !state.loading and !state.error">
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-xl-3" t-foreach="state.data.cards" t-as="card" t-key="card.key">
+                        <button class="card w-100 h-100 text-start p-3 o_visit_metric" t-on-click="() => this.openRecords(card.model, card.domain, card.label)">
+                            <span class="text-muted" t-out="card.label"/><strong class="display-6" t-out="card.count"/>
+                        </button>
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <section class="col-12 col-lg-6">
+                        <div class="card h-100 p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 m-0">Visits by Status</h2><button class="btn btn-link" t-on-click="() => this.openVisits(state.data.domain)">All visits (<t t-out="state.data.total"/>)</button></div>
+                            <t t-call="customer_site_visit.PieChart">
+                                <t t-set="slices" t-value="pieSlices(state.data.statuses)"/>
+                                <t t-set="chartTitle" t-value="'Visits by Status'"/>
+                            </t>
+                            <p t-if="!state.data.total" class="text-muted mt-2">No visits to display.</p>
+                        </div>
+                    </section>
+                    <section class="col-12 col-lg-6">
+                        <div class="card h-100 p-3"><h2 class="h5 mb-3">Visits by Type</h2>
+                            <t t-call="customer_site_visit.PieChart">
+                                <t t-set="slices" t-value="pieSlices(state.data.types)"/>
+                                <t t-set="chartTitle" t-value="'Visits by Type'"/>
+                            </t>
+                            <p t-if="!state.data.types.length" class="text-muted">No visits to display.</p>
+                        </div>
+                    </section>
+                </div>
+                <section class="card p-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-center"><h2 class="h5">Upcoming Visits</h2><button class="btn btn-link" t-on-click="() => this.openVisits(state.data.upcoming_domain)">View all</button></div>
+                    <div class="table-responsive"><table class="table table-hover mb-0">
+                        <thead><tr><th>Visit</th><th>Customer</th><th>Responsible</th><th>Planned start</th></tr></thead>
+                        <tbody><tr t-foreach="state.data.upcoming" t-as="visit" t-key="visit.id">
+                            <td><button class="btn btn-link p-0" t-on-click="() => this.openVisit(visit.id)" t-out="visit.name"/></td>
+                            <td t-out="visit.partner_id ? visit.partner_id[1] : ''"/><td t-out="visit.user_id ? visit.user_id[1] : ''"/><td t-out="formatDate(visit.planned_start)"/>
+                        </tr><tr t-if="!state.data.upcoming.length"><td colspan="4" class="text-muted">No upcoming visits.</td></tr></tbody>
+                    </table></div>
+                    <small class="text-muted mt-2">Showing the next 10 visits.</small>
+                </section>
+                <section class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center"><h2 class="h5">Overdue Follow-ups</h2><button class="btn btn-link" t-on-click="openFollowups">View all</button></div>
+                    <div class="table-responsive"><table class="table table-hover mb-0">
+                        <thead><tr><th>Finding</th><th>Visit</th><th>Responsible</th><th>Deadline</th></tr></thead>
+                        <tbody><tr t-foreach="state.data.findings" t-as="finding" t-key="finding.id">
+                            <td t-out="finding.name"/><td><button class="btn btn-link p-0" t-on-click="() => this.openVisit(finding.visit_id[0])" t-out="finding.visit_id[1]"/></td>
+                            <td t-out="finding.responsible_id ? finding.responsible_id[1] : ''"/><td t-out="finding.deadline"/>
+                        </tr><tr t-if="!state.data.findings.length"><td colspan="4" class="text-muted">No overdue follow-ups.</td></tr></tbody>
+                    </table></div>
+                    <small class="text-muted mt-2">Showing the 10 earliest overdue follow-ups.</small>
+                </section>
+            </t>
+        </div>
+    </t>
+    <t t-name="customer_site_visit.PieChart">
+        <div class="o_visit_pie_layout">
+            <svg class="o_visit_pie" viewBox="0 0 200 200" role="group" t-att-aria-label="chartTitle">
+                <title t-out="chartTitle"/>
+                <circle cx="100" cy="100" r="90" fill="#e9ecef"/>
+                <t t-foreach="slices" t-as="slice" t-key="slice.key">
+                    <path t-if="slice.count" t-att-d="slice.path" t-att-fill="slice.color"
+                          class="o_visit_pie_slice" role="button" tabindex="0"
+                          t-att-aria-label="slice.label + ': ' + slice.count + ' (' + slice.percentage + '%)'"
+                          t-on-click="() => this.openVisits(slice.domain)"
+                          t-on-keydown="(ev) => this.onSliceKeydown(ev, slice.domain)">
+                        <title><t t-out="slice.label"/>: <t t-out="slice.count"/> (<t t-out="slice.percentage"/>%)</title>
+                    </path>
+                </t>
+            </svg>
+            <div class="o_visit_pie_legend">
+                <button t-foreach="slices" t-as="slice" t-key="slice.key"
+                        class="o_visit_legend_item" t-on-click="() => this.openVisits(slice.domain)">
+                    <span class="o_visit_legend_dot" t-att-style="'background-color: ' + slice.color"/>
+                    <span class="flex-grow-1 text-start" t-out="slice.label"/>
+                    <strong t-out="slice.count"/>
+                    <span class="text-muted">(<t t-out="slice.percentage"/>%)</span>
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>

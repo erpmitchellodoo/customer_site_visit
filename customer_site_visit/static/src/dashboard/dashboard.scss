@@ -1,0 +1,29 @@
+.o_site_visit_dashboard {
+    background: var(--o-view-background-color, #f8f9fa);
+    .o_visit_metric {
+        border-top: 3px solid var(--o-brand-primary, #71639e);
+        &:hover, &:focus-visible { background: var(--o-webclient-background-color, #f0edf5); }
+    }
+    .o_visit_pie_layout { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+    .o_visit_pie { width: 240px; max-width: 100%; height: auto; margin: auto; }
+    .o_visit_pie_slice {
+        cursor: pointer;
+        stroke: var(--o-view-background-color, #fff);
+        stroke-width: 1;
+        &:hover, &:focus-visible { opacity: .8; stroke: #212529; stroke-width: 2; outline: none; }
+    }
+    .o_visit_pie_legend { flex: 1 1 220px; min-width: 0; }
+    .o_visit_legend_item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        width: 100%;
+        padding: .5rem;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: inherit;
+        &:hover, &:focus-visible { background: var(--o-webclient-background-color, #f0edf5); }
+    }
+    .o_visit_legend_dot { width: 12px; height: 12px; flex-shrink: 0; border-radius: 50%; }
+}

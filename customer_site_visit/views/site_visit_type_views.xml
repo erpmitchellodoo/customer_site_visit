@@ -1,0 +1,5 @@
+<odoo>
+ <record id="view_site_visit_type_list" model="ir.ui.view"><field name="name">customer.site.visit.type.list</field><field name="model">customer.site.visit.type</field><field name="arch" type="xml"><list editable="bottom"><field name="sequence" widget="handle"/><field name="name"/><field name="active"/></list></field></record>
+ <record id="view_site_visit_type_form" model="ir.ui.view"><field name="name">customer.site.visit.type.form</field><field name="model">customer.site.visit.type</field><field name="arch" type="xml"><form><sheet><group><field name="name"/><field name="active"/></group><notebook><page string="Checklist"><field name="checklist_template_ids"><list editable="bottom"><field name="sequence" widget="handle"/><field name="name"/><field name="required"/></list></field></page></notebook></sheet></form></field></record>
+ <record id="action_site_visit_type" model="ir.actions.act_window"><field name="name">Visit Types</field><field name="res_model">customer.site.visit.type</field><field name="view_mode">list,form</field></record>
+</odoo>

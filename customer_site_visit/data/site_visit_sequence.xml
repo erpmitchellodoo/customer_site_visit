@@ -1,0 +1,1 @@
+<odoo noupdate="1"><record id="seq_customer_site_visit" model="ir.sequence"><field name="name">Customer Site Visit</field><field name="code">customer.site.visit</field><field name="prefix">VIS/%(year)s/</field><field name="padding">5</field><field name="company_id" eval="False"/></record></odoo>
