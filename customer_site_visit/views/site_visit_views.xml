@@ -1,0 +1,223 @@
+<odoo>
+    <record id="view_customer_site_visit_list" model="ir.ui.view">
+        <field name="name">customer.site.visit.list</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'" decoration-danger="state == 'cancel'">
+                <field name="name"/>
+                <field name="planned_start"/>
+                <field name="partner_id"/>
+                <field name="visit_type_id"/>
+                <field name="user_id"/>
+                <field name="state" widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_customer_site_visit_search" model="ir.ui.view">
+        <field name="name">customer.site.visit.search</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="visit_type_id"/>
+                <field name="user_id"/>
+                <filter name="my" string="My Visits" domain="[('user_id','=',uid)]"/>
+                <filter name="planned" string="Planned" domain="[('state','=','planned')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state','=','in_progress')]"/>
+                <filter name="done" string="Completed" domain="[('state','=','done')]"/>
+                <group  name="group_by">
+                    <filter string="Customer" name="customer" context="{'group_by':'partner_id'}"/>
+                    <filter string="Type" name="type" context="{'group_by':'visit_type_id'}"/>
+                    <filter string="Responsible" name="resp" context="{'group_by':'user_id'}"/>
+                    <filter string="State" name="state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_customer_site_visit_calendar" model="ir.ui.view">
+        <field name="name">customer.site.visit.calendar</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <calendar string="Site Visits" date_start="planned_start" date_stop="planned_end" color="user_id">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="visit_type_id"/>
+            </calendar>
+        </field>
+    </record>
+    <record id="view_customer_site_visit_pivot" model="ir.ui.view">
+        <field name="name">customer.site.visit.pivot</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <pivot string="Site Visit Analysis" sample="1">
+                <field name="user_id" type="row"/>
+                <field name="visit_type_id" type="row"/>
+                <field name="planned_start" type="col" interval="month"/>
+                <field name="duration_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_customer_site_visit_graph" model="ir.ui.view">
+        <field name="name">customer.site.visit.graph</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <graph string="Site Visit Analysis" type="bar" sample="1">
+                <field name="planned_start" interval="month"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+    <record id="view_customer_site_visit_activity" model="ir.ui.view">
+        <field name="name">customer.site.visit.activity</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <activity string="Site Visit Activities">
+                <templates>
+                    <div t-name="activity-box" class="d-flex align-items-center">
+                        <field name="user_id" widget="many2one_avatar_user"/>
+                        <div class="flex-grow-1">
+                            <field name="name" display="full" class="fw-bold"/>
+                            <field name="partner_id" display="full" muted="1"/>
+                            <field name="planned_start" display="full"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+    <record id="view_customer_site_visit_form" model="ir.ui.view">
+        <field name="name">customer.site.visit.form</field>
+        <field name="model">customer.site.visit</field>
+        <field name="arch" type="xml">
+            <form string="Customer Site Visit">
+                <header>
+                    <button name="action_plan" type="object" string="Plan" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_check_in" type="object" string="Check In" class="btn-primary"
+                            invisible="state not in ('draft','planned')"/>
+                    <button name="action_complete" type="object" string="Complete / Check Out" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_print_report" type="object" string="Print Report" invisible="state != 'done'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state in ('done','cancel')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,planned,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="contact_id"/>
+                            <field name="visit_type_id"/>
+                            <field name="user_id"/>
+                            <field name="employee_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="planned_start"/>
+                            <field name="planned_end"/>
+                            <field name="check_in"/>
+                            <field name="check_out"/>
+                            <field name="duration_hours" widget="float_time"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="site_address" placeholder="Customer site address..."/>
+                        <field name="purpose" placeholder="Purpose of the visit..."/>
+                    </group>
+                    <notebook>
+                        <page string="Checklist">
+                            <field name="checklist_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="done"/>
+                                    <field name="name"/>
+                                    <field name="required"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Findings &amp; Actions">
+                            <field name="finding_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="action_required"/>
+                                    <field name="action"/>
+                                    <field name="responsible_id"/>
+                                    <field name="deadline"/>
+                                    <field name="done"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Photos">
+                            <field name="photo_ids">
+                                <kanban>
+                                    <templates>
+                                        <t t-name="card">
+                                            <div class="p-2">
+                                                <field name="image" widget="image"/>
+                                                <strong>
+                                                    <field name="stage"/>
+                                                </strong>
+                                                <div>
+                                                    <field name="name"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                        <page string="Visit Report">
+                            <group>
+                                <field name="observations"/>
+                                <field name="recommendation"/>
+                            </group>
+                        </page>
+                        <page string="Customer Acknowledgement">
+                            <group>
+                                <field name="customer_name"/>
+                                <field name="customer_comments"/>
+                                <field name="customer_signature" widget="image"/>
+                            </group>
+                        </page>
+                        <page string="Related Documents">
+                            <group>
+                                <field name="crm_lead_id"/>
+                                <field name="sale_order_id"/>
+                                <field name="project_id"/>
+                                <field name="task_id"/>
+                            </group>
+                        </page>
+                        <page string="Location">
+                            <group>
+                                <field name="checkin_latitude"/>
+                                <field name="checkin_longitude"/>
+                                <field name="checkout_latitude"/>
+                                <field name="checkout_longitude"/>
+                            </group>
+                            <p class="text-muted">V1 stores GPS fields for integrations/manual population; automatic
+                                browser geolocation can be added in a later version.
+                            </p>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_customer_site_visit" model="ir.actions.act_window">
+        <field name="name">Site Visits</field>
+        <field name="res_model">customer.site.visit</field>
+        <field name="view_mode">list,calendar,pivot,graph,activity,form</field>
+        <field name="search_view_id" ref="view_customer_site_visit_search"/>
+    </record>
+</odoo>

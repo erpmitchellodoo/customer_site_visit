@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_visit_user,site.visit.user,model_customer_site_visit,sales_team.group_sale_salesman,1,1,1,0
+access_visit_manager,site.visit.manager,model_customer_site_visit,sales_team.group_sale_manager,1,1,1,1
+access_visit_type_user,site.visit.type.user,model_customer_site_visit_type,sales_team.group_sale_salesman,1,0,0,0
+access_visit_type_manager,site.visit.type.manager,model_customer_site_visit_type,sales_team.group_sale_manager,1,1,1,1
+access_visit_template_user,visit.template.user,model_customer_site_visit_checklist_template,sales_team.group_sale_salesman,1,0,0,0
+access_visit_template_manager,visit.template.manager,model_customer_site_visit_checklist_template,sales_team.group_sale_manager,1,1,1,1
+access_visit_check_user,visit.check.user,model_customer_site_visit_checklist,sales_team.group_sale_salesman,1,1,1,1
+access_visit_finding_user,visit.finding.user,model_customer_site_visit_finding,sales_team.group_sale_salesman,1,1,1,1
+access_visit_photo_user,visit.photo.user,model_customer_site_visit_photo,sales_team.group_sale_salesman,1,1,1,1
